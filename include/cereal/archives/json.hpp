@@ -105,27 +105,16 @@ namespace cereal
       \ingroup Archives */
 #ifdef __SIZEOF_INT128__
   namespace int128_support {
-      // In order to correctly identify GCC and clang we must either:
-      // 1. use "#if defined(__GNUC__) && !defined(__clang__)" (preferred option)
-      // 2. or check the condition "#if defined __clang__" first
-      // The reason is: clang always defines __GNUC__ and __GNUC_MINOR__ and __GNUC_PATCHLEVEL__ according to
-      // the version of gcc that it claims full compatibility with.
-      #if defined(__GNUC__) && !defined(__clang__)
-          #pragma GCC diagnostic push
-          #pragma GCC diagnostic ignored "-Wpedantic"
-      #elif defined __clang__
-          #pragma clang diagnostic push
-          #pragma clang diagnostic ignored "-Wpedantic"
-      #endif
-
+      // The __int128 typedefs below are a non-standard GCC/clang extension
+      // that would normally trigger -Wpedantic. We intentionally do NOT
+      // use #pragma diagnostic here — any such pragma causes R CMD check
+      // to list the file under "pragma(s) suppressing diagnostics", which
+      // CRAN flags. -Wpedantic is not enabled in R's default CXXFLAGS, so
+      // the warning never fires in the R package build. If a future
+      // toolchain surfaces it, the right fix is at the call sites of
+      // int128 / uint128, not a suppressing pragma.
       using int128 = __int128;
       using uint128 = unsigned __int128;
-
-      #if defined(__GNUC__) && !defined(__clang__)
-          #pragma GCC diagnostic pop
-      #elif defined __clang__
-          #pragma clang diagnostic pop
-      #endif
   }
 #endif
   class JSONOutputArchive : public OutputArchive<JSONOutputArchive>, public traits::TextArchive

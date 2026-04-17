@@ -25,11 +25,11 @@
 #ifndef CEREAL_EXTERNAL_BASE64_HPP_
 #define CEREAL_EXTERNAL_BASE64_HPP_
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-
+// -Wconversion would fire on implicit narrowing in the base64 helpers
+// below. We intentionally do NOT use #pragma diagnostic here — R CMD
+// check lists any such pragma under "pragma(s) suppressing diagnostics",
+// which CRAN flags. -Wconversion is not enabled in R's default CXXFLAGS,
+// so the warning never fires in the R package build.
 #include <string>
 
 namespace cereal
@@ -128,7 +128,4 @@ namespace cereal
     }
   } // namespace base64
 } // namespace cereal
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
 #endif // CEREAL_EXTERNAL_BASE64_HPP_
