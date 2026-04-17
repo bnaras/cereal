@@ -106,13 +106,17 @@ namespace cereal
 #ifdef __SIZEOF_INT128__
   namespace int128_support {
       // The __int128 typedefs below are a non-standard GCC/clang extension
-      // that would normally trigger -Wpedantic. We intentionally do NOT
-      // use #pragma diagnostic here — any such pragma causes R CMD check
-      // to list the file under "pragma(s) suppressing diagnostics", which
-      // CRAN flags. -Wpedantic is not enabled in R's default CXXFLAGS, so
-      // the warning never fires in the R package build. If a future
-      // toolchain surfaces it, the right fix is at the call sites of
-      // int128 / uint128, not a suppressing pragma.
+      // and raise -Wpedantic on GCC (R's Makeconf supplies -pedantic via
+      // CXX17FLAGS on Linux and rtools45, so the warning DOES fire in the
+      // R-package build). Upstream cereal never suppressed the warning
+      // with #pragma diagnostic; we follow the same discipline because
+      // the OpenFHE r_pkg fork disables -Werror on its compile flags
+      // (see openfhe-development/CMakeLists.txt), so the pedantic warning
+      // stays a warning and does not fail the build. If a future embedder
+      // re-enables -Werror, they are responsible for either scoping it
+      // out of this file or adding -Wno-error=pedantic to their build —
+      // not for reintroducing a #pragma that R CMD check would then list
+      // under "pragma(s) suppressing diagnostics".
       using int128 = __int128;
       using uint128 = unsigned __int128;
   }

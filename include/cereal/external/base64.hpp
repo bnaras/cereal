@@ -25,11 +25,17 @@
 #ifndef CEREAL_EXTERNAL_BASE64_HPP_
 #define CEREAL_EXTERNAL_BASE64_HPP_
 
-// -Wconversion would fire on implicit narrowing in the base64 helpers
-// below. We intentionally do NOT use #pragma diagnostic here — R CMD
-// check lists any such pragma under "pragma(s) suppressing diagnostics",
-// which CRAN flags. -Wconversion is not enabled in R's default CXXFLAGS,
-// so the warning never fires in the R package build.
+// Upstream cereal wrapped the base64 helpers below in a
+// #pragma GCC diagnostic ... -Wconversion block because some GCC
+// versions warn on the implicit narrowing in the encode/decode math.
+// We omit the pragma here because (1) R CMD check would list this
+// file under "pragma(s) suppressing diagnostics" (CRAN-surveillance
+// concern, not a check failure), and (2) the OpenFHE r_pkg fork
+// disables -Werror, so any -Wconversion warning that does fire stays
+// a warning and does not fail the build. If a future embedder
+// re-enables -Werror for cereal, they are responsible for scoping it
+// out of this file or adding -Wno-error=conversion, not for
+// reintroducing the pragma.
 #include <string>
 
 namespace cereal
